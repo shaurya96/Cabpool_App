@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    <TextView
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:text = "The Cabpool App"
+        android:id = "@+id/textView"
+        android:layout_below = "@+id/textview"
+        android:layout_gravity="center"
+        android:textSize = "35dp"
+        android:padding="40dp"/>
+    <EditText android:id="@+id/reg_fullname"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:hint="Full name"
+        android:layout_marginTop="60dip"
+        android:layout_marginBottom="20dip"/>
+    <EditText android:id="@+id/reg_email"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dip"
+        android:maxLines="1"
+        android:hint="e-mail"
+        android:layout_marginBottom="20dip"/>
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:hint="password"/>
+    <!-- Register Button -->
+    <Button android:id="@+id/btnRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dip"
+        android:text="Sign Up"
+        android:layout_gravity="center"/>
+
+    <!-- Link to Login Screen -->
+        <TextView android:id="@+id/link_to_login"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip"
+        android:layout_marginBottom="40dip"
+        android:text="Already have an account! Login here"
+        android:gravity="center"
+        android:textSize="20dip"
+        android:textColor="#025f7c"/>
+
+</LinearLayout>

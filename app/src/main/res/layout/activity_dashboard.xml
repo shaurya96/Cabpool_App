@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <Button android:id="@+id/btnPoolRequest"
+        android:layout_width="fill_parent"
+        android:layout_height="285dp"
+        android:text="Pool Request"
+        android:layout_marginBottom="-8dp"
+        android:background="#CAEBF2"
+        android:textSize="32sp"/>
+    <Button android:id="@+id/btnBookaCabRequest"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:text="Book a Cab"
+        android:background="#FF3B3F"
+        android:textSize="32sp"/>
+</LinearLayout>

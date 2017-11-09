@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    <TextView
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:text = "The Cabpool App"
+        android:id = "@+id/textView"
+        android:layout_below = "@+id/textview"
+        android:layout_gravity="center"
+        android:textSize = "35dp"
+        android:padding="40dp"/>
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dip"
+        android:layout_marginBottom="20dip"
+        android:maxLines="1"
+        android:hint="e-mail"/>
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:hint="password"/>
+    <TextView
+        android:id="@+id/forgot_password"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dip"
+        android:text="Forgot Password"
+        android:gravity="center"
+        android:textSize="20dip"
+        android:textColor="#0b84aa"/>
+    <!-- Login button -->
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dip"
+        android:text="Login" />
+    <!-- Link to Registration Screen -->
+    <TextView
+        android:id="@+id/link_to_register"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dip"
+        android:layout_marginTop="20dip"
+        android:gravity="center"
+        android:text="New User? Register here"
+        android:textColor="#0b84aa"
+        android:textSize="20dip" />
+</LinearLayout>
