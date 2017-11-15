@@ -10,22 +10,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-        <activity android:name=".SignUpActivity" >
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-        </activity>
+        <activity android:name=".SignUpActivity"></activity>
         <activity android:name=".DashboardActivity" />
-        <activity android:name=".BookCabFormActivity">
-        </activity>
-        <activity android:name=".PoolRequestActivity">
-        </activity>
+        <activity android:name=".BookCabFormActivity"></activity>
+        <activity android:name=".PoolRequestActivity"></activity>
         <activity android:name=".AddPostRequestActivity" />
-        <activity android:name=".BookCabActivity">
-        </activity>
+        <activity android:name=".BookCabActivity"></activity>
     </application>
-
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
