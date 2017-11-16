@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -64,7 +66,6 @@ public class LoginActivity extends AppCompatActivity {
             login_btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0)
             {
-                saveInfo(login_btn);
                 RetrieveData();
                 Intent myIntent = new Intent(LoginActivity.this,
                         DashboardActivity.class);
@@ -81,17 +82,14 @@ public class LoginActivity extends AppCompatActivity {
         });
 
     }
-
     //save user data
-    public void saveInfo(Button btn)
+    public void saveInfo(String user_token)
     {
-        if (btn == login_btn)
-        {
             SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-             editor.putBoolean("hasLoggedIn", true);
-             editor.apply();
-        }
+            editor.putString("token", user_token);
+            editor.putBoolean("hasLoggedIn", true);
+            editor.apply();
     }
     //retrieve user data and convert it to jsonObject
     public void RetrieveData()
@@ -127,6 +125,7 @@ public class LoginActivity extends AppCompatActivity {
         JSONObject jsonObject = (JSONObject) objects[0];
         String jsonlogindata =  jsonObject.toString();
         String jsonResponse = "";
+        String user_token = "";
         InputStream inputStream = null;
         HttpURLConnection conn = null;
         Log.d(LOG_TAG,jsonlogindata);
@@ -154,13 +153,22 @@ public class LoginActivity extends AppCompatActivity {
             writer.close();
             out.close();
             conn.connect();
-
+            /* if both username and password are correct*/
             if(conn.getResponseCode()==200)
             {
                 inputStream = conn.getInputStream();
                 jsonResponse = readFromStream(inputStream);
+                Log.d(LOG_TAG,jsonResponse);
+                user_token = extractFeatureFromJson(jsonResponse);
             }
-            else {
+            /*if any one of them is incorrect*/
+            else if(conn.getResponseCode()==401)
+            {
+              Log.d(LOG_TAG,"Wrong credentials");
+            }
+            /*other problem is there,like internet connectivity problem*/
+            else
+            {
                 Log.e(TAG, "Error response code: " + conn.getResponseCode());
             }
         }
@@ -182,22 +190,42 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         }
-        return jsonResponse;
+        return user_token;
     }
 
       @Override
-      protected void onPostExecute(String s)
+      protected void onPostExecute(String user_token)
       {
-          if(s==null)
+          if(user_token==null)
           {
               return;
           }
           else
           {
-              Log.d(TAG,s);
+             LoginActivity loginActivity = new LoginActivity();
+             loginActivity.saveInfo(user_token);
           }
       }
+      private String extractFeatureFromJson(String jsonResponse)
+      {
+          String user_token = "";
+          if (TextUtils.isEmpty(jsonResponse))
+          {
+            return null ;
+          }
+          try{
+              JSONObject jsonObj = new JSONObject(jsonResponse);
+               user_token = jsonObj.getString("token");
+              Log.d(LOG_TAG,user_token);
+          }
+          catch (Exception e)
+          {
+              e.printStackTrace();
+          }
+        return user_token;
+     }
 
+      @NonNull
       private String readFromStream(InputStream inputStream) throws IOException {
           StringBuilder output = new StringBuilder();
           if (inputStream != null) {

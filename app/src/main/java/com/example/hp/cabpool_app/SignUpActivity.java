@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,26 +32,29 @@ import java.nio.charset.Charset;
 public class SignUpActivity extends AppCompatActivity
 {
 
-    Button sign_up;
+    public Button sign_up;
     TextView linkTologin;
     EditText full_name;
     EditText Mobile_no;
     EditText Email;
     EditText Password;
+    private static final String LOG_TAG = "signupactivity";
+    public SharedPreferences mSharedPreferences;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
+        
         full_name = (EditText)findViewById(R.id.reg_fullname);
         Mobile_no = (EditText)findViewById(R.id.reg_phoneNo);
         Email = (EditText)findViewById(R.id.reg_email);
         Password = (EditText) findViewById(R.id.reg_password);
 
+        mSharedPreferences = getSharedPreferences("signUpInfo", Context.MODE_PRIVATE);
+        boolean hasLoggedIn = mSharedPreferences.getBoolean("hasSignedIn",false);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("signUpInfo", Context.MODE_PRIVATE);
-
-        boolean hasLoggedIn = sharedPreferences.getBoolean("hasSignedIn", false);
         if(hasLoggedIn)
         {
             Intent myIntent = new Intent(SignUpActivity.this,
@@ -62,8 +67,6 @@ public class SignUpActivity extends AppCompatActivity
         sign_up = (Button)findViewById(R.id.btnRegister);
         sign_up.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
-
-                saveInfo(sign_up);
                 RetrieveData();
                 Intent myIntent = new Intent(SignUpActivity.this,
                         DashboardActivity.class);
@@ -84,15 +87,13 @@ public class SignUpActivity extends AppCompatActivity
 
 
 
-    private void saveInfo(Button btn)
+    public void saveInfo(String user_token)
     {
-        if (btn == sign_up)
-        {
-            SharedPreferences sharedPreferences = getSharedPreferences("signUpInfo", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("hasSignedIn", true);
-            editor.apply();
-        }
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                Log.d(LOG_TAG,user_token);
+                editor.putString("token",user_token);
+                editor.putBoolean("hasSignedIn", true);
+                editor.apply();
     }
 
     private void RetrieveData()
@@ -119,7 +120,7 @@ public class SignUpActivity extends AppCompatActivity
 }
 class sendSignupJsonDataToServer extends AsyncTask<Object,Void,String>
 {
-    private static final String TAG = "signupactivity";
+    private static final String LOG_TAG = "signupactivity";
     private static final String SIGN_UP_REQUEST_URL =
             "http://13.127.36.190:3000/users/signup";
 
@@ -130,9 +131,10 @@ class sendSignupJsonDataToServer extends AsyncTask<Object,Void,String>
         JSONObject jsonObject = (JSONObject) objects[0];
         String jsonsignupdata =  jsonObject.toString();
         String jsonResponse = "";
+        String user_token = "";
         InputStream inputStream = null;
         HttpURLConnection conn = null;
-        Log.d(TAG, jsonsignupdata);
+        Log.d(LOG_TAG, jsonsignupdata);
 
         URL url = createUrl(SIGN_UP_REQUEST_URL);
 
@@ -155,13 +157,24 @@ class sendSignupJsonDataToServer extends AsyncTask<Object,Void,String>
             writer.close();
             out.close();
             conn.connect();
+            /*if new user is created successfully*/
             if(conn.getResponseCode()==200)
             {
                 inputStream = conn.getInputStream();
                 jsonResponse = readFromStream(inputStream);
+                Log.d(LOG_TAG,jsonResponse);
+                user_token = extractFeatureFromJson(jsonResponse);
+                //Log.d(LOG_TAG,user_token);
             }
-            else {
-                Log.e(TAG, "Error response code: " + conn.getResponseCode());
+            else if (conn.getResponseCode()==500)
+            {
+
+             Log.d(LOG_TAG,"User already exists");
+            }
+            /*net connectivity issues*/
+            else
+            {
+                Log.e(LOG_TAG, "Error response code: " + conn.getResponseCode());
             }
 
         }catch (Exception e)
@@ -182,21 +195,46 @@ class sendSignupJsonDataToServer extends AsyncTask<Object,Void,String>
                 }
             }
         }
-        return jsonResponse;
+       // Log.d(LOG_TAG,user_token);
+        return user_token;
     }
 
     @Override
-    protected void onPostExecute(String s) {
-        if(s==null)
+    protected void onPostExecute(String user_token)
+    {
+        if(user_token==null)
         {
             return;
         }
         else
         {
-            Log.d(TAG,s);
+            //Log.d(LOG_TAG,user_token);
+            //SignUpActivity signupactivity = new SignUpActivity();
+            //signupactivity.saveInfo(user_token);
         }
     }
 
+    private String extractFeatureFromJson(String jsonResponse)
+    {
+        String user_token = "";
+        if (TextUtils.isEmpty(jsonResponse))
+        {
+            return null;
+        }
+        try{
+            JSONObject jsonObj = new JSONObject(jsonResponse);
+            user_token = jsonObj.getString("token");
+            //Log.d(LOG_TAG,user_token);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return user_token;
+    }
+
+
+    @NonNull
     private String readFromStream(InputStream inputStream) throws IOException {
         StringBuilder output = new StringBuilder();
         if (inputStream != null) {
