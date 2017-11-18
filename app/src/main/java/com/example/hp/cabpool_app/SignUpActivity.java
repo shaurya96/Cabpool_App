@@ -41,18 +41,34 @@ public class SignUpActivity extends AppCompatActivity
     private static final String LOG_TAG = "signupactivity";
     public SharedPreferences mSharedPreferences;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        
+
+
+        mSharedPreferences = getSharedPreferences("signUpInfo", Context.MODE_PRIVATE);
+        sendSignupJsonDataToServer SendSignupJsonDataToServer = new sendSignupJsonDataToServer();
+        SendSignupJsonDataToServer.setUpdateListener(new sendSignupJsonDataToServer.OnUpdateListener()
+                                                     {
+                                                         public void saveInfo(String user_token)
+                                                         {
+                                                             Log.d(LOG_TAG,user_token);
+                                                             SharedPreferences.Editor editor = mSharedPreferences.edit();
+                                                             Log.d(LOG_TAG,user_token);
+                                                             editor.putString("token",user_token);
+                                                             editor.putBoolean("hasSignedIn", true);
+                                                             editor.apply();
+                                                         }
+                                                     }
+        );
+
         full_name = (EditText)findViewById(R.id.reg_fullname);
         Mobile_no = (EditText)findViewById(R.id.reg_phoneNo);
         Email = (EditText)findViewById(R.id.reg_email);
         Password = (EditText) findViewById(R.id.reg_password);
 
-        mSharedPreferences = getSharedPreferences("signUpInfo", Context.MODE_PRIVATE);
+        //mSharedPreferences = getSharedPreferences("signUpInfo", Context.MODE_PRIVATE);
         boolean hasLoggedIn = mSharedPreferences.getBoolean("hasSignedIn",false);
 
         if(hasLoggedIn)
@@ -68,6 +84,7 @@ public class SignUpActivity extends AppCompatActivity
         sign_up.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
                 RetrieveData();
+
                 Intent myIntent = new Intent(SignUpActivity.this,
                         DashboardActivity.class);
                 startActivity(myIntent);
@@ -83,18 +100,11 @@ public class SignUpActivity extends AppCompatActivity
                 startActivity(myIntent);
             }
         });
+
+
+
     }
 
-
-
-    public void saveInfo(String user_token)
-    {
-                SharedPreferences.Editor editor = mSharedPreferences.edit();
-                Log.d(LOG_TAG,user_token);
-                editor.putString("token",user_token);
-                editor.putBoolean("hasSignedIn", true);
-                editor.apply();
-    }
 
     private void RetrieveData()
     {
@@ -123,6 +133,14 @@ class sendSignupJsonDataToServer extends AsyncTask<Object,Void,String>
     private static final String LOG_TAG = "signupactivity";
     private static final String SIGN_UP_REQUEST_URL =
             "http://13.127.36.190:3000/users/signup";
+    OnUpdateListener listener;
+    public interface OnUpdateListener{
+         void saveInfo(String user_token);
+    }
+    public void setUpdateListener(OnUpdateListener listener)
+    {
+        this.listener = listener;
+    }
 
     @Override
     protected String doInBackground(Object... objects)
@@ -208,6 +226,9 @@ class sendSignupJsonDataToServer extends AsyncTask<Object,Void,String>
         }
         else
         {
+
+                listener.saveInfo(user_token);
+
             //Log.d(LOG_TAG,user_token);
             //SignUpActivity signupactivity = new SignUpActivity();
             //signupactivity.saveInfo(user_token);
