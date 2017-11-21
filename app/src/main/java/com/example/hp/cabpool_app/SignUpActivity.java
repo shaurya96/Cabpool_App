@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -40,6 +41,8 @@ public class SignUpActivity extends AppCompatActivity
     EditText Password;
     private static final String LOG_TAG = "signupactivity";
     public SharedPreferences mSharedPreferences;
+    public SendSignupJsonDataToServer sendSignupJsonDataToServer;
+    public Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +51,17 @@ public class SignUpActivity extends AppCompatActivity
 
 
         mSharedPreferences = getSharedPreferences("signUpInfo", Context.MODE_PRIVATE);
-        sendSignupJsonDataToServer SendSignupJsonDataToServer = new sendSignupJsonDataToServer();
-        SendSignupJsonDataToServer.setUpdateListener(new sendSignupJsonDataToServer.OnUpdateListener()
+        boolean hasLoggedIn = mSharedPreferences.getBoolean("hasSignedIn",false);
+
+        if(hasLoggedIn)
+        {
+            Intent myIntent = new Intent(SignUpActivity.this,
+                    DashboardActivity.class);
+            startActivity(myIntent);
+        }
+
+        sendSignupJsonDataToServer = new SendSignupJsonDataToServer(context);
+        sendSignupJsonDataToServer.setUpdateListener(new SendSignupJsonDataToServer.OnUpdateListener()
                                                      {
                                                          public void saveInfo(String user_token)
                                                          {
@@ -69,15 +81,6 @@ public class SignUpActivity extends AppCompatActivity
         Password = (EditText) findViewById(R.id.reg_password);
 
         //mSharedPreferences = getSharedPreferences("signUpInfo", Context.MODE_PRIVATE);
-        boolean hasLoggedIn = mSharedPreferences.getBoolean("hasSignedIn",false);
-
-        if(hasLoggedIn)
-        {
-            Intent myIntent = new Intent(SignUpActivity.this,
-                    DashboardActivity.class);
-            startActivity(myIntent);
-        }
-
 
 
         sign_up = (Button)findViewById(R.id.btnRegister);
@@ -102,9 +105,7 @@ public class SignUpActivity extends AppCompatActivity
         });
 
 
-
     }
-
 
     private void RetrieveData()
     {
@@ -124,16 +125,22 @@ public class SignUpActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
-        new sendSignupJsonDataToServer().execute(jsonObject);
+         sendSignupJsonDataToServer.execute(jsonObject);
 
     }
 }
-class sendSignupJsonDataToServer extends AsyncTask<Object,Void,String>
+class SendSignupJsonDataToServer extends AsyncTask<Object,Void,String>
 {
     private static final String LOG_TAG = "signupactivity";
     private static final String SIGN_UP_REQUEST_URL =
             "http://13.127.36.190:3000/users/signup";
+    Context mContext;
+    public SendSignupJsonDataToServer(Context context){
+        mContext = context;
+    }
     OnUpdateListener listener;
+
+
     public interface OnUpdateListener{
          void saveInfo(String user_token);
     }
@@ -186,8 +193,7 @@ class sendSignupJsonDataToServer extends AsyncTask<Object,Void,String>
             }
             else if (conn.getResponseCode()==500)
             {
-
-             Log.d(LOG_TAG,"User already exists");
+                Toast.makeText(mContext,"User already exists",Toast.LENGTH_SHORT).show();
             }
             /*net connectivity issues*/
             else
@@ -227,7 +233,9 @@ class sendSignupJsonDataToServer extends AsyncTask<Object,Void,String>
         else
         {
 
-                listener.saveInfo(user_token);
+
+                    listener.saveInfo(user_token);
+
 
             //Log.d(LOG_TAG,user_token);
             //SignUpActivity signupactivity = new SignUpActivity();

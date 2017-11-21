@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,16 +40,24 @@ public class LoginActivity extends AppCompatActivity {
     TextView new_user;
     EditText user_Email_field;
     EditText user_Password_field;
-
+    public SendLoginJsonDataToServer sendLoginJsonDataToServer;
+    public SharedPreferences msharedPreferences;
+    private static final String LOG_TAG = "loginactivity";
+    public Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 
-        boolean hasLoggedIn = sharedPreferences.getBoolean("hasLoggedIn", false);
+        login_btn = (Button) findViewById(R.id.btnLogin);
+        user_Email_field = (EditText) findViewById(R.id.userEmailField);
+        user_Password_field = (EditText) findViewById(R.id.userPasswordField);
+
+
+        msharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        boolean hasLoggedIn = msharedPreferences.getBoolean("hasLoggedIn", false);
 
            if(hasLoggedIn)
            {
@@ -57,10 +66,22 @@ public class LoginActivity extends AppCompatActivity {
                startActivity(myIntent);
            }
 
-            login_btn = (Button) findViewById(R.id.btnLogin);
 
-            user_Email_field = (EditText) findViewById(R.id.userEmailField);
-            user_Password_field = (EditText) findViewById(R.id.userPasswordField);
+        sendLoginJsonDataToServer = new SendLoginJsonDataToServer(context);
+        sendLoginJsonDataToServer.setUpdateListener(new SendLoginJsonDataToServer.OnUpdateListener() {
+            @Override
+            public void saveInfo(String user_token)
+            {
+                Log.d(LOG_TAG,user_token);
+                SharedPreferences.Editor editor = msharedPreferences.edit();
+                Log.d(LOG_TAG,user_token);
+                editor.putString("token",user_token);
+                editor.putBoolean("hasSignedIn", true);
+                editor.apply();
+            }
+        }
+
+        );
 
 
             login_btn.setOnClickListener(new View.OnClickListener() {
@@ -82,15 +103,6 @@ public class LoginActivity extends AppCompatActivity {
         });
 
     }
-    //save user data
-    public void saveInfo(String user_token)
-    {
-            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("token", user_token);
-            editor.putBoolean("hasLoggedIn", true);
-            editor.apply();
-    }
     //retrieve user data and convert it to jsonObject
     public void RetrieveData()
    {
@@ -109,17 +121,33 @@ public class LoginActivity extends AppCompatActivity {
            e.printStackTrace();
        }
        //Log.d(TAG, String.valueOf(jsonObject));
-       new sendLoginJsonDataToServer().execute(jsonObject);
+       sendLoginJsonDataToServer.execute(jsonObject);
    }
 }
 
-    class sendLoginJsonDataToServer extends AsyncTask<Object,Void,String>
+    class SendLoginJsonDataToServer extends AsyncTask<Object,Void,String>
   {
       private static final String LOG_TAG = "loginactivity";
       private static final String LOGIN_REQUEST_URL =
               "http://13.127.36.190:3000/users/login";
-    @Override
-    protected String doInBackground(Object... objects)
+      Context mContext;
+
+      public SendLoginJsonDataToServer(Context context){
+          mContext = context;
+      }
+      OnUpdateListener listener;
+
+
+      public interface OnUpdateListener{
+          void saveInfo(String user_token);
+      }
+      public void setUpdateListener(OnUpdateListener listener)
+      {
+          this.listener = listener;
+      }
+
+      @Override
+      protected String doInBackground(Object... objects)
     {
         //json data to be posted on server
         JSONObject jsonObject = (JSONObject) objects[0];
@@ -164,7 +192,7 @@ public class LoginActivity extends AppCompatActivity {
             /*if any one of them is incorrect*/
             else if(conn.getResponseCode()==401)
             {
-              Log.d(LOG_TAG,"Wrong credentials");
+                Toast.makeText(mContext,"Wrong username and password",Toast.LENGTH_SHORT).show();
             }
             /*other problem is there,like internet connectivity problem*/
             else
@@ -202,8 +230,7 @@ public class LoginActivity extends AppCompatActivity {
           }
           else
           {
-             LoginActivity loginActivity = new LoginActivity();
-             loginActivity.saveInfo(user_token);
+              listener.saveInfo(user_token);
           }
       }
       private String extractFeatureFromJson(String jsonResponse)

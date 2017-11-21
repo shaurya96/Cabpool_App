@@ -20,7 +20,7 @@ public class DashboardActivity extends AppCompatActivity {
 
                 // Start NewActivity.class
                 Intent myIntent = new Intent(DashboardActivity.this,
-                        PoolRequestActivity.class);
+                        FragmentActivity.class);
                 startActivity(myIntent);
             }
         });

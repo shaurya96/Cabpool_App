@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.hp.cabpool_app">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,15 +14,29 @@
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SignUpActivity"></activity>
+        <activity android:name=".SignUpActivity" />
         <activity android:name=".DashboardActivity" />
-        <activity android:name=".BookCabFormActivity"></activity>
-        <activity android:name=".PoolRequestActivity"></activity>
+        <activity android:name=".BookCabFormActivity" />
+        <activity android:name=".PoolRequestActivity" />
         <activity android:name=".AddPostRequestActivity" />
-        <activity android:name=".BookCabActivity"></activity>
+        <activity android:name=".BookCabActivity" />
+        <activity android:name=".FragmentActivity">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+
+
+            <!-- <application android:theme="@style/Theme.AppCompat.Light.DarkActionBar" /> -->
+        </activity>
+        <activity android:name=".PoolResponseActivity"></activity>
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
+
 </manifest>
