@@ -21,22 +21,21 @@
         <activity android:name=".SignUpActivity" />
         <activity android:name=".DashboardActivity" />
         <activity android:name=".BookCabFormActivity" />
-        <activity android:name=".PoolRequestActivity" />
+
+
+        <activity android:name=".PoolRequestActivity">
+        </activity>
+
+
         <activity android:name=".AddPostRequestActivity" />
         <activity android:name=".BookCabActivity" />
-        <activity android:name=".FragmentActivity">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
+        <activity android:name=".FragmentActivity"/>
 
 
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-
-
-            <!-- <application android:theme="@style/Theme.AppCompat.Light.DarkActionBar" /> -->
+        <activity android:name=".PoolResponseActivity">
         </activity>
-        <activity android:name=".PoolResponseActivity"></activity>
+
+
     </application>
 
 </manifest>
